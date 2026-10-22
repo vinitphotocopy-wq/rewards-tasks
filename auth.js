@@ -1,7 +1,7 @@
 
 const SUPABASE_URL = "https://vlyfbdyycjakajyyxdkz.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY = "YOUR_PUBLISHABLE_KEY";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axfmRQ4uDoWJEjsP6YVi4w_mOIYnu1L";
 
 if (!window.supabase) {
   throw new Error("Supabase library load nahi hui.");
