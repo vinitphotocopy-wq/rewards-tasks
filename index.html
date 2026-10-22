@@ -2,117 +2,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RewardZone | Earn Points</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      color: #182033;
-    }
-    header {
-      background: #172554;
-      color: white;
-      padding: 22px 18px;
-      border-radius: 0 0 22px 22px;
-    }
-    header h1 { margin: 0 0 6px; }
-    header p { margin: 0; color: #dbeafe; }
-    main { padding: 18px; max-width: 600px; margin: auto; }
-    .balance {
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      margin-top: 18px;
-      box-shadow: 0 3px 14px #0000000b;
-    }
-    .points { font-size: 32px; font-weight: bold; color: #2563eb; }
-    .task {
-      background: white;
-      margin: 12px 0;
-      padding: 16px;
-      border-radius: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-    button {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      padding: 10px 14px;
-      border-radius: 9px;
-      font-weight: bold;
-    }
-    button:disabled { background: #9ca3af; }
-    .note { color: #64748b; font-size: 13px; line-height: 1.5; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10162f">
+<title>RewardZone — Earn Rewards</title>
+<style>
+:root {
+  --bg:#f4f6fc; --card:#fff; --ink:#17203b;
+  --muted:#788198; --primary:#5755e7; --line:#e9ebf4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:Arial,Helvetica,sans-serif;padding-bottom:86px}
+button{font:inherit;cursor:pointer}
+.top{
+ background:linear-gradient(135deg,#10162f,#252b60);
+ color:white;padding:23px 19px 30px;border-radius:0 0 25px 25px
+}
+.topline{display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:23px;font-weight:800;letter-spacing:-.6px}
+.brand span{color:#a9a7ff}
+.pill{background:#ffffff18;border:1px solid #ffffff25;
+ padding:8px 11px;border-radius:30px;font-size:12px}
+.greeting{margin-top:23px;font-size:14px;color:#d4d8f4}
+.top h2{font-size:25px;margin:7px 0}
+.top p{font-size:13px;color:#c5c9e6;margin:0}
+main{max-width:650px;margin:auto;padding:0 16px}
+.balance{
+ margin-top:-16px;position:relative;background:var(--card);
+ border-radius:19px;padding:19px;box-shadow:0 8px 25px #141c3c0c
+}
+.balancehead{display:flex;justify-content:space-between;align-items:center}
+.label{font-size:13px;color:var(--muted)}
+.points{font-size:34px;font-weight:800;margin:9px 0;color:var(--primary)}
+.points small{font-size:14px}
+.badge{background:#edecff;color:#5148c9;border-radius:20px;
+ padding:6px 9px;font-size:11px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
+.stat{background:#f7f8ff;border-radius:12px;padding:12px}
+.stat strong{display:block;font-size:19px;margin-bottom:4px}
+.stat span{font-size:11px;color:var(--muted)}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;
+ margin:25px 1px 13px}
+.sectionhead h3{margin:0;font-size:18px}
+.smallbtn{background:none;border:0;color:var(--primary);
+ font-size:12px;font-weight:bold}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.quick button{border:1px solid var(--line);background:white;
+ border-radius:14px;padding:14px 2px 12px;color:var(--ink)}
+.quick .emoji{font-size:23px;display:block;margin-bottom:9px}
+.quick span:last-child{font-size:11px}
+.task,.reward,.refcard,.profilecard{
+ background:var(--card);border:1px solid var(--line);
+ border-radius:15px;padding:15px;margin-bottom:10px
+}
+.task{display:flex;align-items:center;gap:12px}
+.taskicon{width:43px;height:43px;display:grid;place-items:center;
+ border-radius:13px;background:#efefff;font-size:21px;flex-shrink:0}
+.taskbody{flex:1;min-width:0}
+.taskbody strong{font-size:13px}
+.taskbody p{font-size:11px;color:var(--muted);margin:6px 0 0}
+.action{border:0;border-radius:9px;background:var(--primary);
+ color:white;font-size:12px;font-weight:bold;padding:10px 12px}
+.action:disabled{background:#e5e7ef;color:#737b91}
+.reward{display:flex;align-items:center;gap:12px}
+.rewardicon{width:47px;height:47px;border-radius:12px;
+ background:#fff5df;display:grid;place-items:center;font-size:24px}
+.rewardinfo{flex:1}
+.rewardinfo strong{font-size:13px}
+.rewardinfo p{font-size:11px;color:var(--muted);margin:6px 0 0}
+.page{display:none;padding-top:5px}
+.page.active{display:block}
+.note{font-size:11px;line-height:1.6;color:var(--muted);margin:17px 2px}
+.refcode{padding:14px;background:#f1f1ff;border-radius:12px;
+ font-weight:bold;letter-spacing:2px;text-align:center;margin:13px 0}
+.field{width:100%;border:1px solid var(--line);border-radius:10px;
+ padding:12px;margin:8px 0;background:#fff;color:var(--ink)}
+.bottom{
+ position:fixed;bottom:0;left:0;right:0;z-index:10;
+ background:#fff;border-top:1px solid var(--line);
+ display:flex;justify-content:space-around;padding:10px 3px max(10px,env(safe-area-inset-bottom))
+}
+.nav{border:0;background:none;color:#8990a4;font-size:10px;
+ display:flex;flex-direction:column;align-items:center;gap:5px;min-width:55px}
+.nav b{font-size:20px;font-weight:normal}
+.nav.active{color:var(--primary);font-weight:bold}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);
+ background:#17203b;color:white;padding:12px 16px;border-radius:12px;
+ font-size:12px;display:none;z-index:20;width:max-content;max-width:90%}
+@media(min-width:520px){.quick{gap:13px}.task,.reward{padding:18px}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>RewardZone</h1>
-    <p>Complete tasks. Collect points.</p>
-  </header>
+<header class="top">
+ <div class="topline">
+  <div class="brand">Reward<span>Zone</span></div>
+  <div class="pill">✨ Rewards Demo</div>
+ </div>
+ <div class="greeting" id="greeting">WELCOME BACK</div>
+ <h2>Small tasks. Big goals.</h2>
+ <p>Explore tasks and collect demo points.</p>
+</header>
 
-  <main>
-    <section class="balance">
-      <p>Your demo balance</p>
-      <div class="points"><span id="points">0</span> pts</div>
-      <p class="note">Demo points only — not real money.</p>
-    </section>
+<main>
+ <section id="home" class="page active">
+  <div class="balance">
+   <div class="balancehead">
+    <span class="label">Your total points</span>
+    <span class="badge">DEMO ACCOUNT</span>
+   </div>
+   <div class="points"><span id="points">0</span> <small>PTS</small></div>
+   <div class="stats">
+    <div class="stat"><strong id="completedCount">0</strong><span>Tasks completed</span></div>
+    <div class="stat"><strong>3</strong><span>Sample tasks available</span></div>
+   </div>
+  </div>
+  <div class="sectionhead"><h3>Explore</h3></div>
+  <div class="quick">
+   <button onclick="showPage('tasks')"><span class="emoji">🎯</span><span>Tasks</span></button>
+   <button onclick="showPage('rewards')"><span class="emoji">🎁</span><span>Rewards</span></button>
+   <button onclick="showPage('referrals')"><span class="emoji">👥</span><span>Invite</span></button>
+   <button onclick="showPage('profile')"><span class="emoji">👤</span><span>Profile</span></button>
+  </div>
+  <div class="sectionhead"><h3>Recommended tasks</h3>
+   <button class="smallbtn" onclick="showPage('tasks')">View all →</button>
+  </div>
+  <div id="homeTasks"></div>
+ </section>
 
-    <h2>Available Tasks</h2>
-    <div id="tasks"></div>
+ <section id="tasks" class="page">
+  <div class="sectionhead"><h3>Available Tasks</h3></div>
+  <p class="label">Complete these sample activities to earn demo points.</p>
+  <div id="allTasks"></div>
+ </section>
 
-    <p class="note">
-      This is a front-end demo. Points reset when the page reloads.
-      No real ads, payouts, or verified rewards are enabled.
-    </p>
-  </main>
+ <section id="rewards" class="page">
+  <div class="sectionhead"><h3>Rewards Store</h3></div>
+  <p class="label">Explore sample rewards. Redemption is not connected.</p>
+  <div id="rewardList"></div>
+  <p class="note">These are illustrative reward cards only. No voucher, cash, or real item will be issued.</p>
+ </section>
 
-  <script>
-    let points = 0;
+ <section id="referrals" class="page">
+  <div class="sectionhead"><h3>Invite Friends</h3></div>
+  <div class="refcard">
+   <div style="font-size:32px">🤝</div>
+   <h3>Grow together</h3>
+   <p class="label">This demo referral code is for interface testing only. No referral rewards are issued.</p>
+   <div class="refcode">DEMO2026</div>
+   <button class="action" onclick="copyCode()">Copy demo code</button>
+  </div>
+ </section>
 
-    const tasks = [
-      { id: 1, title: "Explore the website", reward: 10 },
-      { id: 2, title: "Read reward rules", reward: 15 },
-      { id: 3, title: "Visit the task page", reward: 20 }
-    ];
+ <section id="profile" class="page">
+  <div class="sectionhead"><h3>Your Profile</h3></div>
+  <div class="profilecard">
+   <div style="font-size:36px">👤</div>
+   <h3>Demo User</h3>
+   <p class="label">Guest account · Data saved on this browser only</p>
+   <label class="label" for="nickname">Display name</label>
+   <input class="field" id="nickname" maxlength="30" placeholder="Enter a display name">
+   <button class="action" onclick="saveName()">Save name</button>
+   <button class="action" style="background:#e9eafa;color:#4542bd;margin-left:5px" onclick="resetDemo()">Reset demo</button>
+  </div>
+  <p class="note">This prototype does not have secure accounts or a server. Browser data may be lost if site data is cleared or a different device is used.</p>
+ </section>
 
-    const completed = [];
+ <p class="note">RewardZone prototype · Demo points only. No live ads, real-money rewards, or withdrawals are enabled.</p>
+</main>
 
-    function renderTasks() {
-      document.getElementById("points").textContent = points;
+<nav class="bottom">
+ <button class="nav active" data-page="home" onclick="showPage('home')"><b>⌂</b>Home</button>
+ <button class="nav" data-page="tasks" onclick="showPage('tasks')"><b>☷</b>Tasks</button>
+ <button class="nav" data-page="rewards" onclick="showPage('rewards')"><b>🎁</b>Rewards</button>
+ <button class="nav" data-page="referrals" onclick="showPage('referrals')"><b>♧</b>Invite</button>
+ <button class="nav" data-page="profile" onclick="showPage('profile')"><b>♙</b>Profile</button>
+</nav>
+<div class="toast" id="toast"></div>
 
-      document.getElementById("tasks").innerHTML = tasks.map(task => `
-        <div class="task">
-          <div>
-            <strong>${task.title}</strong>
-            <p class="note">Reward: ${task.reward} demo points</p>
-          </div>
-          <button
-            ${completed.includes(task.id) ? "disabled" : ""}
-            onclick="completeTask(${task.id})">
-            ${completed.includes(task.id) ? "Done" : "Claim"}
-          </button>
-        </div>
-      `).join("");
-    }
+<script>
+const taskData = [
+ {id:1,icon:"🔎",title:"Explore the website",desc:"Look around the demo homepage",points:10},
+ {id:2,icon:"📖",title:"Read reward rules",desc:"Learn how this demo works",points:15},
+ {id:3,icon:"🧭",title:"Explore the task section",desc:"Visit the available tasks",points:20}
+];
+const rewardData = [
+ {icon:"🎟️",title:"Sample Voucher",desc:"Illustrative reward · Demo only",points:100},
+ {icon:"🎮",title:"Gaming Gift Card",desc:"Illustrative reward · Demo only",points:250},
+ {icon:"⭐",title:"Premium Perk",desc:"Illustrative reward · Demo only",points:500}
+];
+const storageKey="rewardzone_demo_v1";
+let state={points:0,completed:[],name:""};
 
-    function completeTask(id) {
-      const task = tasks.find(item => item.id === id);
-      if (!task || completed.includes(id)) return;
+try {
+ const saved=JSON.parse(localStorage.getItem(storageKey)||"null");
+ if(saved && typeof saved==="object") state={...state,...saved};
+} catch(e) {}
 
-      completed.push(id);
-      points += task.reward;
-      renderTasks();
-    }
-
-    renderTasks();
-  </script>
+function saveState(){
+ try { localStorage.setItem(storageKey,JSON.stringify(state)); }
+ catch(e) { showToast("Browser storage unavailable. Demo data may reset."); }
+}
+function safeText(value){
+ const div=document.createElement("div");
+ div.textContent=value;
+ return div.innerHTML;
+}
+function taskCard(t){
+ const done=state.completed.includes(t.id);
+ return `<div class="task">
+  <div class="taskicon">${t.icon}</div>
+  <div class="taskbody"><strong>${t.title}</strong>
+   <p>${t.desc} · +${t.points} demo pts</p></div>
+  <button class="action" ${done?"disabled":""} onclick="completeTask(${t.id})">${done?"Done":"Claim"}</button>
+ </div>`;
+}
+function render(){
+ document.getElementById("points").textContent=state.points;
+ document.getElementById("completedCount").textContent=state.completed.length;
+ document.getElementById("allTasks").innerHTML=taskData.map(taskCard).join("");
+ document.getElementById("homeTasks").innerHTML=taskData.slice(0,2).map(taskCard).join("");
+ document.getElementById("rewardList").innerHTML=rewardData.map(r=>`
+  <div class="reward"><div class="rewardicon">${r.icon}</div>
+   <div class="rewardinfo"><strong>${r.title}</strong><p>${r.desc}</p></div>
+   <span class="badge">${r.points} pts</span>
+  </div>`).join("");
+ document.getElementById("nickname").value=state.name||"";
+ document.getElementById("greeting").textContent=state.name
+  ? "WELCOME, "+state.name.toUpperCase() : "WELCOME TO REWARDZONE";
+}
+function completeTask(id){
+ const task=taskData.find(t=>t.id===id);
+ if(!task||state.completed.includes(id))return;
+ state.completed.push(id);
+ state.points+=task.points;
+ saveState();render();
+ showToast("+"+task.points+" demo points added!");
+}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function showToast(message){
+ const el=document.getElementById("toast");
+ el.textContent=message;el.style.display="block";
+ clearTimeout(window.toastTimeout);
+ window.toastTimeout=setTimeout(()=>el.style.display="none",2300);
+}
+function copyCode(){
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText("DEMO2026").then(()=>showToast("Demo code copied!"))
+   .catch(()=>showToast("Demo code: DEMO2026"));
+ } else showToast("Demo code: DEMO2026");
+}
+function saveName(){
+ state.name=document.getElementById("nickname").value.trim().slice(0,30);
+ saveState();render();showToast("Display name saved on this browser.");
+}
+function resetDemo(){
+ if(!confirm("Reset demo points and completed tasks?"))return;
+ state={points:0,completed:[],name:""};
+ saveState();render();showToast("Demo has been reset.");
+}
+render();
+</script>
 </body>
 </html>
