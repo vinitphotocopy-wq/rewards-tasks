@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RewardZone | Earn Points</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #182033;
+    }
+    header {
+      background: #172554;
+      color: white;
+      padding: 22px 18px;
+      border-radius: 0 0 22px 22px;
+    }
+    header h1 { margin: 0 0 6px; }
+    header p { margin: 0; color: #dbeafe; }
+    main { padding: 18px; max-width: 600px; margin: auto; }
+    .balance {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin-top: 18px;
+      box-shadow: 0 3px 14px #0000000b;
+    }
+    .points { font-size: 32px; font-weight: bold; color: #2563eb; }
+    .task {
+      background: white;
+      margin: 12px 0;
+      padding: 16px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-weight: bold;
+    }
+    button:disabled { background: #9ca3af; }
+    .note { color: #64748b; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RewardZone</h1>
+    <p>Complete tasks. Collect points.</p>
+  </header>
+
+  <main>
+    <section class="balance">
+      <p>Your demo balance</p>
+      <div class="points"><span id="points">0</span> pts</div>
+      <p class="note">Demo points only — not real money.</p>
+    </section>
+
+    <h2>Available Tasks</h2>
+    <div id="tasks"></div>
+
+    <p class="note">
+      This is a front-end demo. Points reset when the page reloads.
+      No real ads, payouts, or verified rewards are enabled.
+    </p>
+  </main>
+
+  <script>
+    let points = 0;
+
+    const tasks = [
+      { id: 1, title: "Explore the website", reward: 10 },
+      { id: 2, title: "Read reward rules", reward: 15 },
+      { id: 3, title: "Visit the task page", reward: 20 }
+    ];
+
+    const completed = [];
+
+    function renderTasks() {
+      document.getElementById("points").textContent = points;
+
+      document.getElementById("tasks").innerHTML = tasks.map(task => `
+        <div class="task">
+          <div>
+            <strong>${task.title}</strong>
+            <p class="note">Reward: ${task.reward} demo points</p>
+          </div>
+          <button
+            ${completed.includes(task.id) ? "disabled" : ""}
+            onclick="completeTask(${task.id})">
+            ${completed.includes(task.id) ? "Done" : "Claim"}
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function completeTask(id) {
+      const task = tasks.find(item => item.id === id);
+      if (!task || completed.includes(id)) return;
+
+      completed.push(id);
+      points += task.reward;
+      renderTasks();
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
