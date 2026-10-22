@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10162f">
+<title>Login / Register — RewardZone</title>
+<style>
+:root {
+  --bg:#f4f6fc; --ink:#17203b; --muted:#788198;
+  --primary:#5755e7; --line:#e9ebf4;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; min-height:100vh; padding:24px 16px;
+  display:grid; place-items:center;
+  background:var(--bg); color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.card {
+  width:100%; max-width:420px; background:#fff;
+  padding:25px; border-radius:22px;
+  box-shadow:0 12px 35px #141c3c10;
+}
+.brand { font-size:27px; font-weight:800; text-align:center; }
+.brand span { color:var(--primary); }
+.subtitle { color:var(--muted); text-align:center; font-size:13px; }
+.tabs { display:flex; gap:8px; margin:24px 0 20px; }
+.tabs button {
+  flex:1; border:1px solid var(--line); padding:12px;
+  border-radius:10px; background:#f7f8fc;
+  color:var(--ink); font-weight:bold;
+}
+.tabs button.active { background:var(--primary); color:white; }
+label { display:block; font-size:12px; font-weight:bold; margin-top:14px; }
+input {
+  width:100%; padding:13px; margin-top:7px;
+  border:1px solid var(--line); border-radius:10px;
+  font:inherit; outline-color:var(--primary);
+}
+.passwordrow { display:flex; gap:7px; align-items:center; }
+.passwordrow input { flex:1; min-width:0; }
+.passwordrow button {
+  margin-top:7px; padding:12px 10px;
+  border:1px solid var(--line); background:#fff; border-radius:9px;
+}
+.submit {
+  width:100%; margin-top:22px; padding:14px;
+  border:0; border-radius:11px; background:var(--primary);
+  color:white; font-weight:bold; font-size:15px;
+}
+.submit:disabled { opacity:.6; }
+.message { font-size:13px; line-height:1.5; margin-top:15px; }
+.home { display:block; text-align:center; margin-top:20px;
+  color:var(--primary); font-size:13px; text-decoration:none; }
+.hidden { display:none; }
+.smallnote { color:var(--muted); font-size:11px; line-height:1.6; margin-top:17px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">Reward<span>Zone</span></div>
+  <p class="subtitle">Sign in or create your account</p>
+
+  <div class="tabs">
+    <button id="loginTab" class="active" type="button">Login</button>
+    <button id="registerTab" type="button">Register</button>
+  </div>
+
+  <form id="authForm">
+    <div id="nameGroup" class="hidden">
+      <label for="name">Display name</label>
+      <input id="name" type="text" maxlength="30"
+        autocomplete="name" placeholder="Enter your name">
+    </div>
+
+    <label for="email">Email address</label>
+    <input id="email" type="email" autocomplete="email"
+      required placeholder="you@example.com">
+
+    <label for="password">Password</label>
+    <div class="passwordrow">
+      <input id="password" type="password" minlength="8"
+        autocomplete="current-password" required
+        placeholder="At least 8 characters">
+      <button id="togglePassword" type="button">Show</button>
+    </div>
+
+    <button id="submitBtn" class="submit" type="submit">Login</button>
+    <div id="message" class="message" role="status" aria-live="polite"></div>
+  </form>
+
+  <a class="home" href="./index.html">← Back to RewardZone</a>
+  <p class="smallnote">
+    RewardZone prototype. Demo points have no cash value.
+    Never share your password with anyone.
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+const nameGroup = document.getElementById("nameGroup");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const submitBtn = document.getElementById("submitBtn");
+const message = document.getElementById("message");
+const form = document.getElementById("authForm");
+
+let mode = "login";
+
+function setMode(nextMode) {
+  mode = nextMode;
+  const registering = mode === "register";
+
+  loginTab.classList.toggle("active", !registering);
+  registerTab.classList.toggle("active", registering);
+  nameGroup.classList.toggle("hidden", !registering);
+  nameInput.required = registering;
+  passwordInput.autocomplete = registering
+    ? "new-password" : "current-password";
+  submitBtn.textContent = registering ? "Create account" : "Login";
+  message.textContent = "";
+}
+
+loginTab.addEventListener("click", () => setMode("login"));
+registerTab.addEventListener("click", () => setMode("register"));
+
+document.getElementById("togglePassword").addEventListener("click", () => {
+  const visible = passwordInput.type === "password";
+  passwordInput.type = visible ? "text" : "password";
+  document.getElementById("togglePassword").textContent =
+    visible ? "Hide" : "Show";
+});
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  message.textContent = "";
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Please wait...";
+
+  try {
+    if (!window.rewardZoneAuth) {
+      throw new Error("Auth setup missing. Check auth.js and the Publishable key.");
+    }
+
+    let result;
+
+    if (mode === "register") {
+      result = await window.rewardZoneAuth.registerUser(
+        nameInput.value,
+        emailInput.value,
+        passwordInput.value
+      );
+    } else {
+      result = await window.rewardZoneAuth.loginUser(
+        emailInput.value,
+        passwordInput.value
+      );
+    }
+
+    message.textContent = result.message;
+    message.style.color = result.success ? "#237443" : "#c0392b";
+
+    if (result.success && mode === "login") {
+      window.location.href = "./index.html";
+      return;
+    }
+
+    if (result.success && mode === "register" && result.user) {
+      passwordInput.value = "";
+      message.textContent +=
+        " If confirmation is required, open the email link before logging in.";
+    }
+  } catch (error) {
+    message.style.color = "#c0392b";
+    message.textContent = error.message || "Something went wrong.";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent =
+      mode === "register" ? "Create account" : "Login";
+  }
+});
+
+(async () => {
+  try {
+    if (window.rewardZoneAuth) {
+      const result = await window.rewardZoneAuth.getCurrentUser();
+      if (result.success && result.user) {
+        message.style.color = "#237443";
+        message.textContent = "You are already logged in.";
+      }
+    }
+  } catch (error) {
+    console.error("Session check failed:", error);
+  }
+})();
+</script>
+</body>
+</html>
