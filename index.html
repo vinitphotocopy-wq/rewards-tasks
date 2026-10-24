@@ -317,5 +317,29 @@ async function handleLogout() {
 
 updateAuthButton();
 </script>  
+  <script>
+async function loadProfile() {
+  if (!window.rewardZoneAuth) return;
+
+  const result = await window.rewardZoneAuth.getCurrentUser();
+
+  const nameEl = document.getElementById("profileName");
+  const emailEl = document.getElementById("profileEmail");
+
+  if (!nameEl || !emailEl) return;
+
+  if (result.success && result.user) {
+    nameEl.textContent =
+      result.user.user_metadata?.display_name || "RewardZone User";
+
+    emailEl.textContent = result.user.email || "Email unavailable";
+  } else {
+    nameEl.textContent = "Not logged in";
+    emailEl.textContent = "Please log in to view account details.";
+  }
+}
+
+loadProfile();
+  </script>
 </body>
 </html>
