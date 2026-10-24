@@ -262,10 +262,45 @@ function copyCode(){
    .catch(()=>showToast("Demo code: DEMO2026"));
  } else showToast("Demo code: DEMO2026");
 }
-function saveName(){
- state.name=document.getElementById("nickname").value.trim().slice(0,30);
- saveState();render();showToast("Display name saved on this browser.");
+
+async function saveName() {
+  const input = document.getElementById("nickname");
+  const name = input.value.trim().slice(0, 30);
+
+  if (!name) {
+    showToast("Please enter a display name.");
+    return;
+  }
+
+  if (window.rewardZoneAuth) {
+    const current = await window.rewardZoneAuth.getCurrentUser();
+
+    if (current.success && current.user) {
+      const result = await window.rewardZoneAuth.updateDisplayName(name);
+
+      if (!result.success) {
+        showToast(result.message || "Could not update name.");
+        return;
+      }
+
+      state.name = name;
+      saveState();
+      render();
+
+      const profileName = document.getElementById("profileName");
+      if (profileName) profileName.textContent = name;
+
+      showToast("Account name updated successfully.");
+      return;
+    }
+  }
+
+  state.name = name;
+  saveState();
+  render();
+  showToast("Name saved on this browser only.");
 }
+
 function resetDemo(){
  if(!confirm("Reset demo points and completed tasks?"))return;
  state={points:0,completed:[],name:""};
