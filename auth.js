@@ -1,7 +1,7 @@
 
 const SUPABASE_URL = "https://vlyfbdyycjakajyyxdkz.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axfmRQ4uDoWJEjsP6YVi4w_mOIYnu1L";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axfmRQ4uDoWJEjsP6YVi4u_mOIYnu1L";
 
 if (!window.supabase) {
   throw new Error("Supabase library load nahi hui.");
@@ -17,7 +17,7 @@ async function registerUser(name, email, password) {
     email: email.trim(),
     password,
     options: {
-      data: { display_name: name.trim() }
+      data: { display_name: name.trim().slice(0, 30) }
     }
   });
 
@@ -64,10 +64,37 @@ async function getCurrentUser() {
   return { success: true, user: data.user };
 }
 
+// Update the logged-in user's display name
+async function updateDisplayName(name) {
+  const cleanName = name.trim().slice(0, 30);
+
+  if (!cleanName) {
+    return {
+      success: false,
+      message: "Please enter a display name."
+    };
+  }
+
+  const { data, error } = await supabaseClient.auth.updateUser({
+    data: { display_name: cleanName }
+  });
+
+  if (error) {
+    return { success: false, message: error.message };
+  }
+
+  return {
+    success: true,
+    user: data.user,
+    message: "Display name updated!"
+  };
+}
+
 window.rewardZoneAuth = {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
+  updateDisplayName,
   supabaseClient
 };
