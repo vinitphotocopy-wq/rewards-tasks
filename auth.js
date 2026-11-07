@@ -1,95 +1,198 @@
 
 const SUPABASE_URL = "https://vlyfbdyycjakajyyxdkz.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_axfmRQ4uDoWJEjsP6YVi4w_mOIYnu1L";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_axfmRQ4uDoWJEjsP6YVi4w_mOIYnu1L";
 
+// Initialize Supabase
 if (!window.supabase) {
-  throw new Error("Supabase library load nahi hui.");
+  throw new Error("Supabase library load nahi hui. CDN check karo.");
 }
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
 );
 
-async function registerUser(name, email, password) {
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email.trim(),
-    password,
-    options: {
-      data: { display_name: name.trim().slice(0, 30) }
-    }
-  });
-
-  if (error) return { success: false, message: error.message };
-
+// Common error handler
+function authError(error) {
   return {
-    success: true,
-    message: data.session
-      ? "Registration successful!"
-      : "Account bana. Email confirmation check karo.",
-    user: data.user
+    success: false,
+    message: error?.message || "Something went wrong. Please try again."
   };
 }
 
-async function loginUser(email, password) {
-  const { data, error } = await supabaseClient.auth
-    .signInWithPassword({
-      email: email.trim(),
-      password
+// REGISTER
+async function registerUser(name, email, password) {
+  try {
+    const cleanName = name.trim().slice(0, 30);
+    const cleanEmail = email.trim();
+
+    if (!cleanName || !cleanEmail || !password) {
+      return {
+        success: false,
+        message: "Please fill all fields."
+      };
+    }
+
+    if (password.length < 6) {
+      return {
+        success: false,
+        message: "Password must be at least 6 characters."
+      };
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: cleanEmail,
+      password: password,
+      options: {
+        data: {
+          display_name: cleanName
+        }
+      }
     });
 
-  if (error) return { success: false, message: error.message };
+    if (error) return authError(error);
 
-  return {
-    success: true,
-    message: "Login successful!",
-    user: data.user
-  };
+    return {
+      success: true,
+      user: data.user,
+      message: data.session
+        ? "Registration successful!"
+        : "Account created. Please verify your email."
+    };
+
+  } catch (error) {
+    return authError(error);
+  }
 }
 
+// LOGIN
+async function loginUser(email, password) {
+  try {
+    if (!email.trim() || !password) {
+      return {
+        success: false,
+        message: "Email and password are required."
+      };
+    }
+
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email.trim(),
+        password: password
+      });
+
+    if (error) return authError(error);
+
+    return {
+      success: true,
+      user: data.user,
+      message: "Login successful!"
+    };
+
+  } catch (error) {
+    return authError(error);
+  }
+}
+
+// LOGOUT
 async function logoutUser() {
-  const { error } = await supabaseClient.auth.signOut();
+  try {
+    const { error } = await supabaseClient.auth.signOut();
 
-  if (error) return { success: false, message: error.message };
+    if (error) return authError(error);
 
-  return { success: true, message: "Logout successful!" };
+    return {
+      success: true,
+      message: "Logout successful!"
+    };
+
+  } catch (error) {
+    return authError(error);
+  }
 }
 
+// GET CURRENT USER
 async function getCurrentUser() {
-  const { data, error } = await supabaseClient.auth.getUser();
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getUser();
 
-  if (error) return { success: false, user: null };
+    if (error) {
+      return {
+        success: false,
+        user: null,
+        message: error.message
+      };
+    }
 
-  return { success: true, user: data.user };
-}
+    return {
+      success: true,
+      user: data.user
+    };
 
-// Update the logged-in user's display name
-async function updateDisplayName(name) {
-  const cleanName = name.trim().slice(0, 30);
-
-  if (!cleanName) {
+  } catch (error) {
     return {
       success: false,
-      message: "Please enter a display name."
+      user: null,
+      message: error.message
     };
   }
-
-  const { data, error } = await supabaseClient.auth.updateUser({
-    data: { display_name: cleanName }
-  });
-
-  if (error) {
-    return { success: false, message: error.message };
-  }
-
-  return {
-    success: true,
-    user: data.user,
-    message: "Display name updated!"
-  };
 }
 
+// UPDATE DISPLAY NAME
+async function updateDisplayName(name) {
+  try {
+    const cleanName = name.trim().slice(0, 30);
+
+    if (!cleanName) {
+      return {
+        success: false,
+        message: "Please enter a display name."
+      };
+    }
+
+    const { data, error } =
+      await supabaseClient.auth.updateUser({
+        data: {
+          display_name: cleanName
+        }
+      });
+
+    if (error) return authError(error);
+
+    return {
+      success: true,
+      user: data.user,
+      message: "Display name updated!"
+    };
+
+  } catch (error) {
+    return authError(error);
+  }
+}
+
+// AUTH STATE LISTENER
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  window.dispatchEvent(
+    new CustomEvent("rewardzone-auth-change", {
+      detail: {
+        event: event,
+        user: session?.user || null
+      }
+    })
+  );
+});
+
+// GLOBAL FUNCTIONS
 window.rewardZoneAuth = {
   registerUser,
   loginUser,
@@ -98,3 +201,10 @@ window.rewardZoneAuth = {
   updateDisplayName,
   supabaseClient
 };
+
+// Backward compatibility for existing index.html
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+window.logoutUser = logoutUser;
+window.getCurrentUser = getCurrentUser;
+window.updateDisplayName = updateDisplayName;
